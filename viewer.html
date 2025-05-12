@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Auction Viewer</title>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+  <style>
+    /* Base styling */
+/* Base reset & layout */
+/* Base layout */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 15px;
+  background-color: #f4f6f9;
+  color: #2c3e50;
+}
+
+h1, h2 {
+  text-align: center;
+  color: #1a1a1a;
+  margin-bottom: 20px;
+}
+
+/* Section containers */
+.team-section,
+.player-section,
+.history-section {
+  margin-bottom: 30px;
+}
+
+/* Reusable card layout */
+.player, .team, .history-item {
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  background-color: #ffffff;
+}
+
+/* Random Player Styling */
+#randomPlayer {
+  background-color: #fef3c7; /* Soft yellow */
+  border-left: 5px solid #f59e0b; /* Amber accent */
+}
+
+/* Player text spacing */
+#randomPlayer p {
+  margin: 8px 0;
+  font-size: 15px;
+}
+
+/* Flex container for teams */
+.teams-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.team-container {
+  flex: 1 1 320px;
+  max-width: 420px;
+}
+
+/* Team Info */
+.team-info {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* Color palette for team tables */
+.team-container:nth-child(1) table { background-color: #e0f7fa; } /* Cyan */
+.team-container:nth-child(2) table { background-color: #e8f5e9; } /* Green */
+.team-container:nth-child(3) table { background-color: #fff3e0; } /* Orange */
+.team-container:nth-child(4) table { background-color: #ede7f6; } /* Purple */
+.team-container:nth-child(5) table { background-color: #fce4ec; } /* Pink */
+.team-container:nth-child(6) table { background-color: #f3e5f5; } /* Lavender */
+
+/* Table styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+thead {
+  background-color: rgba(0,0,0,0.05);
+  font-size: 14px;
+  text-transform: uppercase;
+  color: #555;
+}
+
+th, td {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  font-size: 14px;
+}
+
+/* History items */
+.history-item {
+  font-size: 14px;
+  color: #4b4b4b;
+  line-height: 1.5;
+}
+
+.history-item strong {
+  color: #2980b9;
+}
+
+.history-item small {
+  display: block;
+  margin-top: 4px;
+  color: #888;
+}
+
+/* Responsive mobile layout */
+@media (max-width: 600px) {
+  .teams-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .team-container {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  th, td {
+    font-size: 13px;
+  }
+
+  .team-info {
+    font-size: 15px;
+  }
+
+  h1, h2 {
+    font-size: 20px;
+  }
+}
+
+
+  </style>
+</head>
+<body>
+  <h1>Auction Viewer</h1>
+
+  <div class="player-section">
+    <h2>Current Random Player in Auction</h2>
+    <div id="randomPlayer" class="player">
+      <p><strong>Name:</strong> <span id="playerName">Loading...</span></p>
+      <p><strong>Position:</strong> <span id="playerPosition">Loading...</span></p>
+      <p><strong>Value:</strong> <span id="playerValue">Loading...</span></p>
+      <p><strong>Status:</strong> <span id="playerStatus">Loading...</span></p>
+    </div>
+  </div>
+
+  <div class="team-section">
+    <h2>All Teams</h2>
+    <div id="teamsList" class="teams-container"></div>
+  </div>
+
+  <div class="history-section">
+    <h2>Auction History</h2>
+    <div id="historyList"></div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDFRn4zd8ITDKZV_ad5RBeQd-AbQXvouck",
+      authDomain: "teamauction-bb3da.firebaseapp.com",
+      projectId: "teamauction-bb3da"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Real-time listener for current random player
+    function listenForRandomPlayer() {
+      const currentPlayerRef = db.collection("currentSpinPlayer").doc("currentPlayer");
+
+      currentPlayerRef.onSnapshot((doc) => {
+        if (!doc.exists) {
+          document.getElementById("randomPlayer").innerHTML = "<p>No player has been spun yet.</p>";
+          return;
+        }
+
+        const player = doc.data();
+        
+        // Check if position exists, otherwise use "N/A"
+        const playerPosition = player.position && player.position.trim() !== "" ? player.position : "N/A";
+
+        document.getElementById("playerName").innerText = player.name;
+        document.getElementById("playerPosition").innerText = playerPosition;  // Display the position
+        document.getElementById("playerValue").innerText = player.value;
+        document.getElementById("playerStatus").innerText = player.status;
+      });
+    }
+
+    // Real-time listener for teams and players
+    function listenForTeams() {
+      const teamsList = document.getElementById("teamsList");
+      teamsList.innerHTML = ""; // Clear existing content
+
+      db.collection("teams").onSnapshot(async (teamsSnapshot) => {
+        teamsList.innerHTML = ""; // Clear existing teams
+
+        teamsSnapshot.forEach(async (teamDoc) => {
+          const team = teamDoc.data();
+          const teamDiv = document.createElement("div");
+          teamDiv.className = "team-container";  // Added class for team container
+
+          const teamInfo = `
+            <div class="team-info">
+              <strong>${team.name}</strong> (Remaining Credit: ${team.credit})
+            </div>
+          `;
+
+          teamDiv.innerHTML = teamInfo;
+
+          // Create table for players
+          const table = document.createElement("table");
+          const header = `
+            <thead>
+              <tr>
+                <th>Player Name</th>
+                <th>Position</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+          `;
+          table.innerHTML = header;
+
+          // Now fetch the players signed by the team
+          const playersSnapshot = await db.collection("players")
+            .where("team", "==", team.name)
+            .onSnapshot((playersSnapshot) => {
+              const tbody = document.createElement("tbody");
+              playersSnapshot.forEach(playerDoc => {
+                const player = playerDoc.data();
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+                  <td>${player.name}</td>
+                  <td>${player.position || "N/A"}</td>
+                  <td>${player.value}</td>
+                `;
+
+                tbody.appendChild(row);
+              });
+
+              table.appendChild(tbody);
+              teamDiv.appendChild(table);
+              teamsList.appendChild(teamDiv);
+            });
+        });
+      });
+    }
+
+    // Real-time listener for auction history
+    function listenForAuctionHistory() {
+      const historyList = document.getElementById("historyList");
+      historyList.innerHTML = "Loading..."; // Show loading message
+
+      db.collection("auctionHistory")
+        .orderBy("timestamp", "desc")
+        .limit(10)
+        .onSnapshot((historySnapshot) => {
+          if (historySnapshot.empty) {
+            historyList.innerHTML = "<p>No auction history available.</p>";
+            return;
+          }
+
+          historyList.innerHTML = ""; // Clear loading message
+          historySnapshot.forEach(doc => {
+            const data = doc.data();
+            const time = data.timestamp?.toDate().toLocaleString() || "Just now";
+            const historyItem = document.createElement("div");
+            historyItem.className = "history-item";
+
+            historyItem.innerHTML = `
+              <strong>${data.player}</strong> - ${data.status.toUpperCase()} 
+              ${data.team ? `→ ${data.team}` : ''} 
+              (${data.value || "N/A"}) 
+              <br><small>${time}</small>
+            `;
+
+            historyList.appendChild(historyItem);
+          });
+        });
+    }
+
+    // Initialize the viewer page by listening for real-time updates
+    function initializeViewer() {
+      listenForRandomPlayer();  // Listen for changes in the current random player
+      listenForTeams();         // Listen for changes in teams and their players
+      listenForAuctionHistory();  // Listen for changes in auction history
+    }
+
+    // Run the viewer initialization
+    initializeViewer();
+  </script>
+</body>
+</html>
