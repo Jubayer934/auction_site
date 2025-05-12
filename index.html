@@ -9,6 +9,7 @@
     /* Base styling */
 /* Base reset & layout */
 /* Base layout */
+/* Base reset & layout */
 body {
   font-family: 'Segoe UI', sans-serif;
   margin: 0;
@@ -131,17 +132,51 @@ th, td {
   }
 
   th, td {
-    font-size: 13px;
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .team-info {
+    font-size: 14px;
+  }
+
+  h1, h2 {
+    font-size: 18px;
+  }
+
+  /* Adjust player section styles for mobile */
+  .player p {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .team-container {
+    flex: 1 1 48%;
+    max-width: 48%;
+  }
+
+  h1, h2 {
+    font-size: 22px;
   }
 
   .team-info {
     font-size: 15px;
   }
 
-  h1, h2 {
-    font-size: 20px;
+  th, td {
+    font-size: 13px;
   }
 }
+
+@media (min-width: 1024px) {
+  /* On larger screens, you can tweak for more spacing */
+  .team-container {
+    flex: 1 1 30%;
+    max-width: 30%;
+  }
+}
+
 
 
   </style>
