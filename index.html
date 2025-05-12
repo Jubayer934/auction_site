@@ -6,211 +6,108 @@
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
   <style>
-    /* Base styling */
-/* Base reset & layout */
-/* Base layout */
-/* Base reset & layout */
-body {
-  font-family: 'Segoe UI', sans-serif;
-  margin: 0;
-  padding: 15px;
-  background-color: #f4f6f9;
-  color: #2c3e50;
-}
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 15px;
+      background: linear-gradient(to right, #e0f7fa, #f3e5f5);
+      color: #2c3e50;
+    }
 
-h1, h2 {
-  text-align: center;
-  color: #1a1a1a;
-  margin-bottom: 20px;
-}
+    h1, h2 {
+      text-align: center;
+      color: #1a1a1a;
+      margin-bottom: 20px;
+    }
 
-/* Section containers */
-.team-section,
-.player-section,
-.history-section {
-  margin-bottom: 30px;
-}
+    .team-section,
+    .player-section,
+    .history-section {
+      margin-bottom: 30px;
+    }
 
-/* Reusable card layout */
-.player, .team, .history-item {
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  padding: 15px 20px;
-  margin-bottom: 15px;
-  background-color: #ffffff;
-}
+    .player, .team, .history-item {
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      padding: 15px 20px;
+      margin-bottom: 15px;
+      background-color: #ffffff;
+    }
 
-/* Random Player Styling */
-#randomPlayer {
-  background-color: #fef3c7; /* Soft yellow */
-  border-left: 5px solid #f59e0b; /* Amber accent */
-}
+    #randomPlayer {
+      background-color: #fef3c7;
+      border-left: 5px solid #f59e0b;
+    }
 
-/* Player text spacing */
-#randomPlayer p {
-  margin: 8px 0;
-  font-size: 15px;
-}
+    #randomPlayer p {
+      margin: 8px 0;
+      font-size: 15px;
+    }
 
-/* Flex container for teams */
-.teams-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-}
+    .teams-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
 
-.team-container {
-  flex: 1 1 320px;
-  max-width: 420px;
-}
+    .team-container {
+      flex: 1 1 320px;
+      max-width: 420px;
+      background-color: #e3f2fd;
+      border-left: 4px solid #2196f3;
+      padding: 15px;
+      border-radius: 10px;
+    }
 
-/* Team Info */
-.team-info {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 10px;
-}
+    .team-info {
+      font-size: 16px;
+      font-weight: 600;
+      color: #0d47a1;
+      margin-bottom: 12px;
+    }
 
-/* Color palette for team tables */
-.team-container:nth-child(1) table { background-color: #e0f7fa; } /* Cyan */
-.team-container:nth-child(2) table { background-color: #e8f5e9; } /* Green */
-.team-container:nth-child(3) table { background-color: #fff3e0; } /* Orange */
-.team-container:nth-child(4) table { background-color: #ede7f6; } /* Purple */
-.team-container:nth-child(5) table { background-color: #fce4ec; } /* Pink */
-.team-container:nth-child(6) table { background-color: #f3e5f5; } /* Lavender */
+    .player-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
 
-/* Table styling */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-  border-radius: 8px;
-  overflow: hidden;
-}
+    .player-card {
+      background-color: #ffffff;
+      padding: 12px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      font-size: 15px;
+    }
 
-thead {
-  background-color: rgba(0,0,0,0.05);
-  font-size: 14px;
-  text-transform: uppercase;
-  color: #555;
-}
+    .player-card p {
+      margin: 4px 0;
+      line-height: 1.4;
+    }
 
-th, td {
-  padding: 10px;
-  border-bottom: 1px solid #ccc;
-  font-size: 14px;
-}
+    .history-item {
+      font-size: 14px;
+      color: #4b4b4b;
+      line-height: 1.5;
+    }
 
-/* History items */
-.history-item {
-  font-size: 14px;
-  color: #4b4b4b;
-  line-height: 1.5;
-}
+    .history-item strong {
+      color: #2980b9;
+    }
 
-.history-item strong {
-  color: #2980b9;
-}
+    .history-item small {
+      display: block;
+      margin-top: 4px;
+      color: #888;
+    }
 
-.history-item small {
-  display: block;
-  margin-top: 4px;
-  color: #888;
-}
-
-/* Responsive mobile layout */
-/* Improve table readability on small screens */
-@media (max-width: 600px) {
-/* Team box styling */
-.team {
-  flex: 1 1 30%;
-  box-sizing: border-box;
-  padding: 8px;
-  background: #f9f9f9;
-  border-radius: 8px;
-}
-
-  .team table {
-    width: 100%;
-    table-layout: fixed;
-  }
-
-  .team th,
-  .team td {
-    font-size: 14px;
-    padding: 6px 8px;
-    word-wrap: break-word;
-  }
-
-.team-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  justify-content: space-between;
-}
-
-  .team h3 {
-    font-size: 16px;
-    margin-bottom: 6px;
-  }
-
-  .team table {
-    border-spacing: 0;
-    border-collapse: collapse;
-  }
-
-  .team th {
-    background: #f0f0f0;
-  }
-
-  .team td {
-    background: #fff;
-  }
-}
-
-
-@media (max-width: 768px) {
-  .team-container {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .team {
-    width: 100%;
-    flex: 1 1 100%;
-  }
-
-  .team table {
-    width: 100%;
-    table-layout: auto;
-  }
-
-  .team th,
-  .team td {
-    font-size: 14px;
-    padding: 6px 8px;
-    word-wrap: break-word;
-  }
-
-  .team h3 {
-    font-size: 16px;
-    margin-bottom: 8px;
-  }
-}
-
-@media (min-width: 1024px) {
-  /* On larger screens, you can tweak for more spacing */
-  .team-container {
-    flex: 1 1 30%;
-    max-width: 30%;
-  }
-}
-
-
-
-
-
+    @media (max-width: 768px) {
+      .team-container {
+        flex: 1 1 100%;
+        max-width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
@@ -245,7 +142,6 @@ th, td {
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Real-time listener for current random player
     function listenForRandomPlayer() {
       const currentPlayerRef = db.collection("currentSpinPlayer").doc("currentPlayer");
 
@@ -256,81 +152,65 @@ th, td {
         }
 
         const player = doc.data();
-        
-        // Check if position exists, otherwise use "N/A"
         const playerPosition = player.position && player.position.trim() !== "" ? player.position : "N/A";
 
         document.getElementById("playerName").innerText = player.name;
-        document.getElementById("playerPosition").innerText = playerPosition;  // Display the position
+        document.getElementById("playerPosition").innerText = playerPosition;
         document.getElementById("playerValue").innerText = player.value;
         document.getElementById("playerStatus").innerText = player.status;
       });
     }
 
-    // Real-time listener for teams and players
     function listenForTeams() {
       const teamsList = document.getElementById("teamsList");
-      teamsList.innerHTML = ""; // Clear existing content
+      teamsList.innerHTML = "";
 
       db.collection("teams").onSnapshot(async (teamsSnapshot) => {
-        teamsList.innerHTML = ""; // Clear existing teams
+        teamsList.innerHTML = "";
 
         teamsSnapshot.forEach(async (teamDoc) => {
           const team = teamDoc.data();
           const teamDiv = document.createElement("div");
-          teamDiv.className = "team-container";  // Added class for team container
+          teamDiv.className = "team-container";
 
           const teamInfo = `
             <div class="team-info">
               <strong>${team.name}</strong> (Remaining Credit: ${team.credit})
             </div>
           `;
-
           teamDiv.innerHTML = teamInfo;
 
-          // Create table for players
-          const table = document.createElement("table");
-          const header = `
-            <thead>
-              <tr>
-                <th>Player Name</th>
-                <th>Position</th>
-                <th>Value</th>
-              </tr>
-            </thead>
-          `;
-          table.innerHTML = header;
+          const playerList = document.createElement("div");
+          playerList.className = "player-list";
 
-          // Now fetch the players signed by the team
-          const playersSnapshot = await db.collection("players")
+          db.collection("players")
             .where("team", "==", team.name)
             .onSnapshot((playersSnapshot) => {
-              const tbody = document.createElement("tbody");
+              playerList.innerHTML = ""; // Clear previous players
+
               playersSnapshot.forEach(playerDoc => {
                 const player = playerDoc.data();
-                const row = document.createElement("tr");
+                const card = document.createElement("div");
+                card.className = "player-card";
 
-                row.innerHTML = `
-                  <td>${player.name}</td>
-                  <td>${player.position || "N/A"}</td>
-                  <td>${player.value}</td>
+                card.innerHTML = `
+                  <p><strong>Name:</strong> ${player.name}</p>
+                  <p><strong>Position:</strong> ${player.position || "N/A"}</p>
+                  <p><strong>Value:</strong> ${player.value}</p>
                 `;
-
-                tbody.appendChild(row);
+                playerList.appendChild(card);
               });
 
-              table.appendChild(tbody);
-              teamDiv.appendChild(table);
+              teamDiv.appendChild(playerList);
               teamsList.appendChild(teamDiv);
             });
         });
       });
     }
 
-    // Real-time listener for auction history
     function listenForAuctionHistory() {
       const historyList = document.getElementById("historyList");
-      historyList.innerHTML = "Loading..."; // Show loading message
+      historyList.innerHTML = "Loading...";
 
       db.collection("auctionHistory")
         .orderBy("timestamp", "desc")
@@ -341,7 +221,7 @@ th, td {
             return;
           }
 
-          historyList.innerHTML = ""; // Clear loading message
+          historyList.innerHTML = "";
           historySnapshot.forEach(doc => {
             const data = doc.data();
             const time = data.timestamp?.toDate().toLocaleString() || "Just now";
@@ -354,20 +234,17 @@ th, td {
               (${data.value || "N/A"}) 
               <br><small>${time}</small>
             `;
-
             historyList.appendChild(historyItem);
           });
         });
     }
 
-    // Initialize the viewer page by listening for real-time updates
     function initializeViewer() {
-      listenForRandomPlayer();  // Listen for changes in the current random player
-      listenForTeams();         // Listen for changes in teams and their players
-      listenForAuctionHistory();  // Listen for changes in auction history
+      listenForRandomPlayer();
+      listenForTeams();
+      listenForAuctionHistory();
     }
 
-    // Run the viewer initialization
     initializeViewer();
   </script>
 </body>
