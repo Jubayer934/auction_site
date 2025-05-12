@@ -120,35 +120,52 @@ th, td {
 }
 
 /* Responsive mobile layout */
+/* Improve table readability on small screens */
 @media (max-width: 600px) {
-  .teams-container {
-    flex-direction: column;
-    align-items: center;
+  .team {
+    min-width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 16px;
+    padding: 8px;
+    overflow-x: auto;
+  }
+
+  .team table {
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  .team th,
+  .team td {
+    font-size: 14px;
+    padding: 6px 8px;
+    word-wrap: break-word;
   }
 
   .team-container {
-    flex: 1 1 100%;
-    max-width: 100%;
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  th, td {
-    font-size: 12px;
-    padding: 8px;
+  .team h3 {
+    font-size: 16px;
+    margin-bottom: 6px;
   }
 
-  .team-info {
-    font-size: 14px;
+  .team table {
+    border-spacing: 0;
+    border-collapse: collapse;
   }
 
-  h1, h2 {
-    font-size: 18px;
+  .team th {
+    background: #f0f0f0;
   }
 
-  /* Adjust player section styles for mobile */
-  .player p {
-    font-size: 14px;
+  .team td {
+    background: #fff;
   }
 }
+
 
 @media (max-width: 768px) {
   .team-container {
@@ -176,6 +193,8 @@ th, td {
     max-width: 30%;
   }
 }
+
+
 
 
 
