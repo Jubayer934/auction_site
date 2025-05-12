@@ -5,9 +5,10 @@
   <title>Auction Viewer</title>
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Poppins', sans-serif;
       margin: 0;
       padding: 15px;
       background: linear-gradient(to right, #e0f7fa, #f3e5f5);
@@ -24,6 +25,9 @@
     .player-section,
     .history-section {
       margin-bottom: 30px;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: rgba(255, 255, 255, 0.7);
     }
 
     .player, .team, .history-item {
@@ -32,6 +36,7 @@
       padding: 15px 20px;
       margin-bottom: 15px;
       background-color: #ffffff;
+      animation: fadeIn 0.4s ease-in;
     }
 
     #randomPlayer {
@@ -102,11 +107,27 @@
       color: #888;
     }
 
+    .message-highlight {
+      background-color: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 8px 12px;
+      margin-top: 6px;
+      font-weight: 500;
+      color: #7a5901;
+      border-radius: 6px;
+      font-size: 20px;
+    }
+
     @media (max-width: 768px) {
       .team-container {
         flex: 1 1 100%;
         max-width: 100%;
       }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -186,7 +207,7 @@
           db.collection("players")
             .where("team", "==", team.name)
             .onSnapshot((playersSnapshot) => {
-              playerList.innerHTML = ""; // Clear previous players
+              playerList.innerHTML = "";
 
               playersSnapshot.forEach(playerDoc => {
                 const player = playerDoc.data();
@@ -209,35 +230,48 @@
     }
 
     function listenForAuctionHistory() {
-      const historyList = document.getElementById("historyList");
-      historyList.innerHTML = "Loading...";
+  const historyList = document.getElementById("historyList");
+  historyList.innerHTML = "Loading...";
 
-      db.collection("auctionHistory")
-        .orderBy("timestamp", "desc")
-        .limit(10)
-        .onSnapshot((historySnapshot) => {
-          if (historySnapshot.empty) {
-            historyList.innerHTML = "<p>No auction history available.</p>";
-            return;
-          }
+  db.collection("auctionHistory")
+    .orderBy("timestamp", "desc")
+    .limit(20)
+    .onSnapshot((historySnapshot) => {
+      if (historySnapshot.empty) {
+        historyList.innerHTML = "<p>No auction history available.</p>";
+        return;
+      }
 
-          historyList.innerHTML = "";
-          historySnapshot.forEach(doc => {
-            const data = doc.data();
-            const time = data.timestamp?.toDate().toLocaleString() || "Just now";
-            const historyItem = document.createElement("div");
-            historyItem.className = "history-item";
+      historyList.innerHTML = "";
 
-            historyItem.innerHTML = `
-              <strong>${data.player}</strong> - ${data.status.toUpperCase()} 
-              ${data.team ? `→ ${data.team}` : ''} 
-              (${data.value || "N/A"}) 
-              <br><small>${time}</small>
-            `;
-            historyList.appendChild(historyItem);
-          });
-        });
-    }
+      historySnapshot.forEach(doc => {
+        const data = doc.data();
+        const time = data.timestamp?.toDate().toLocaleString() || "Just now";
+        const historyItem = document.createElement("div");
+        historyItem.className = "history-item";
+
+        if (data.type === "message") {
+          // Display the message in a special highlighted box
+          historyItem.innerHTML = `
+            <div class="message-highlight"><strong>📢 ${data.message}</strong></div>
+            <small>${time}</small>
+          `;
+        } else {
+          // Regular auction entry
+          historyItem.innerHTML = `
+            <strong>${data.player}</strong> - ${data.status?.toUpperCase() || "UNKNOWN"} 
+            ${data.team ? `→ ${data.team}` : ''} 
+            (${data.value || "N/A"}) 
+            ${data.message ? `<div class="message-highlight">${data.message}</div>` : ""}
+            <small>${time}</small>
+          `;
+        }
+
+        historyList.appendChild(historyItem);
+      });
+    });
+}
+
 
     function initializeViewer() {
       listenForRandomPlayer();
